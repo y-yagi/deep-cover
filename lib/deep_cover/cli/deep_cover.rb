@@ -115,7 +115,7 @@ module DeepCover
       elsif options[:expression]
         require_relative 'debugger'
         CLI::Debugger.new(options[:expression], **options).show
-      elsif parse_result.parser.stopped_for_command
+      elsif parse_result.exec?
         require_relative 'exec'
         CLI::Exec.new(parse_result.arguments, **options).run
       else
