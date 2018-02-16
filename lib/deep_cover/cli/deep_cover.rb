@@ -34,7 +34,7 @@ module DeepCover
       puts menu
     end
 
-    class OptionParser < Struct.new(:delegate)
+    class AddDefaultToOptionsDescription < Struct.new(:delegate)
       def method_missing(method, *args, &block) # rubocop:disable Style/MethodMissing
         options = args.last
         if options.is_a?(Hash) && options.has_key?(:default)
@@ -46,7 +46,7 @@ module DeepCover
 
     def parse
       Slop.parse do |o|
-        yield OptionParser.new(o)
+        yield AddDefaultToOptionsDescription.new(o)
       end
     end
 
