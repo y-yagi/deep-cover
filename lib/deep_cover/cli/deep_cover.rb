@@ -31,7 +31,7 @@ module DeepCover
     end
 
     def show_help
-      puts menu
+      puts parse_options
     end
 
     class AddDefaultToOptionsDescription < Struct.new(:delegate)
@@ -44,17 +44,12 @@ module DeepCover
       end
     end
 
-    def parse
-      Slop.parse do |o|
-        yield AddDefaultToOptionsDescription.new(o)
-      end
-    end
-
-    def menu
-      @menu ||= parse do |o|
+    def parse_options
+      @parse_options ||= Slop::Options.new do |o|
+        o = AddDefaultToOptionsDescription.new(o)
         o.banner = ['usage: deep-cover [options] exec <command ...>',
                     '   or  deep-cover [options] [path/to/app/or/gem]',
-                   ].join("\n")
+        ].join("\n")
         o.separator ''
         o.string '-o', '--output', 'output folder', default: DEFAULTS[:output]
         o.string '--reporter', 'reporter', default: DEFAULTS[:reporter]
@@ -90,6 +85,10 @@ module DeepCover
       end
     end
 
+    def parse_result
+      @parse_result ||= parse_options.parse(ARGV)
+    end
+
     def convert_options(options)
       iu = options[:ignore_uncovered] = []
       @ignore_uncovered_map.each do |cli_option, option|
@@ -100,18 +99,18 @@ module DeepCover
     end
 
     def go
-      options = convert_options(menu.to_h)
+      options = convert_options(parse_result.to_h)
       if options[:help]
         show_help
       elsif options[:expression]
         require_relative 'debugger'
         CLI::Debugger.new(options[:expression], **options).show
-      elsif menu.parser.stopped
+      elsif parse_result.parser.stopped
         require_relative 'exec'
-        CLI::Exec.new(menu.arguments, **options).run
+        CLI::Exec.new(parse_result.arguments, **options).run
       else
         require_relative 'instrumented_clone_reporter'
-        path = menu.arguments.first || '.'
+        path = parse_result.arguments.first || '.'
         CLI::InstrumentedCloneReporter.new(path, **options).run
       end
     end
