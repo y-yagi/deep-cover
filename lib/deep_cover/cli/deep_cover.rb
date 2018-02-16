@@ -99,6 +99,16 @@ module DeepCover
     end
 
     def go
+      begin
+        parse_result
+      rescue Slop::UnknownOption => e
+        abort e.message
+      end
+
+      if !parse_result.arguments.empty? && !parse_result.parser.stopped_for_command
+        abort "Unexpected argument: #{parse_result.arguments.first.inspect}"
+      end
+
       options = convert_options(parse_result.to_h)
       if options[:help]
         show_help
