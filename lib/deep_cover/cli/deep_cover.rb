@@ -8,12 +8,12 @@ module DeepCover
   end
 
   module CLI::SlopExtension
-    attr_accessor :stopped
+    attr_accessor :stopped_for_command
     attr_reader :ignored
 
     def try_process(*)
       @ignored ||= 0
-      return if stopped
+      return if stopped_for_command
       o = super
       @ignored += 1 unless o
       o
@@ -80,7 +80,7 @@ module DeepCover
         o.boolean('-h', '--help')
 
         o.boolean('exec', '', help: false) do
-          o.parser.stopped = true if o.parser.ignored == 0
+          o.parser.stopped_for_command = true if o.parser.ignored == 0
         end
       end
     end
@@ -105,7 +105,7 @@ module DeepCover
       elsif options[:expression]
         require_relative 'debugger'
         CLI::Debugger.new(options[:expression], **options).show
-      elsif parse_result.parser.stopped
+      elsif parse_result.parser.stopped_for_command
         require_relative 'exec'
         CLI::Exec.new(parse_result.arguments, **options).run
       else
