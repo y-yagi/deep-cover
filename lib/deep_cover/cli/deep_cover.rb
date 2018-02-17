@@ -85,8 +85,8 @@ module DeepCover
       end
     end
 
-    def parse_result
-      @parse_result ||= parse_options.parse(ARGV)
+    def parse_result(arg_values = ARGV)
+      @parse_result ||= parse_options.parse(arg_values)
     end
 
     def convert_options(options)
@@ -98,9 +98,9 @@ module DeepCover
       options
     end
 
-    def go
+    def go(arg_values = ARGV)
       begin
-        parse_result
+        parse_result(arg_values)
       rescue Slop::UnknownOption => e
         abort e.message
       end
