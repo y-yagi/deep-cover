@@ -90,6 +90,12 @@ module DeepCover
     end
 
     def go(arg_values = ARGV)
+      case ARGV.first
+      when 'clear', 'clean'
+        require_relative 'clear'
+        return CLI::Clear.from_argv(arg_values[1..-1]).go
+      end
+
       begin
         parse_result(arg_values)
       rescue Slop::UnknownOption => e

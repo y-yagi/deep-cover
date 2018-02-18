@@ -78,6 +78,42 @@ module DeepCover
       end
     end
 
+    describe 'deep-cover clear' do
+      let(:options) { '' }
+      let(:path) { 'covered_trivial_gem' }
+      let(:command) { "cd spec/cli_fixtures/#{path} && ../../../exe/deep-cover clear #{options}" }
+      let(:root_path) { Pathname("spec/cli_fixtures/#{path}") }
+      let(:cov_path) { root_path.join('coverage') }
+      let(:nested_path) { cov_path.join('subdir') }
+
+      it "doesn't fail if no coverage dir" do
+        cov_path.rmtree if cov_path.exist?
+        output
+        cov_path.exist?.should be false
+        root_path.exist?.should be true
+      end
+
+      it 'clears the coverage dir' do
+        nested_path.mkpath
+        nested_path.join('something.html').write('NOT REALLY HTML...')
+        output
+        cov_path.exist?.should be false
+        root_path.exist?.should be true
+      end
+
+      describe 'with options' do
+        let(:options) { '-o coverage2' }
+        let(:cov_path) { root_path.join('coverage2') }
+        it 'clears the coverage2 dir' do
+          nested_path.mkpath
+          nested_path.join('something.html').write('NOT REALLY HTML...')
+          output
+          cov_path.exist?.should be false
+          root_path.exist?.should be true
+        end
+      end
+    end
+
     it 'Can run `exe/deep-cover --version`' do
       'exe/deep-cover --version'.should run_successfully
     end
