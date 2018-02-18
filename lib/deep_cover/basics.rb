@@ -9,6 +9,7 @@ module DeepCover
                tracker_global: '$_cov',
                reporter: :html,
                output: './coverage',
+               merge: false,
              }.freeze
 
   CLI_DEFAULTS = {

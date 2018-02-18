@@ -68,6 +68,14 @@ module DeepCover
       end
     end
 
+    def merge(merge = nil)
+      if merge != nil
+        change(:merge, merge)
+      else
+        @options[:merge]
+      end
+    end
+
     def reset
       DEFAULTS.each do |key, value|
         change(key, value)

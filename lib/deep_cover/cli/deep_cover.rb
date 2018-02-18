@@ -45,6 +45,7 @@ module DeepCover
         o.string '-o', '--output', 'output folder', default: DEFAULTS[:output]
         o.string '--reporter', 'reporter', default: DEFAULTS[:reporter]
         o.bool '--open', 'open the output coverage', default: CLI_DEFAULTS[:open]
+        o.bool '-m', '--merge', 'merge with previous run'
 
         o.separator 'Coverage options'
         @ignore_uncovered_map = OPTIONALLY_COVERED.map do |option|
