@@ -96,9 +96,11 @@ module DeepCover
         abort e.message
       end
 
-      if !parse_result.arguments.empty? && !parse_result.parser.stopped_for_command
-        abort "Unexpected argument: #{parse_result.arguments.first.inspect}"
-      end
+      # When we only have exec that has no command at the start...
+      # Right now, wealso have clone mode...
+      # if !parse_result.arguments.empty? && !parse_result.parser.stopped_for_command
+      #   abort "Unexpected argument: #{parse_result.arguments.first.inspect}"
+      # end
 
       options = convert_options(parse_result.to_h)
       if options[:help]
@@ -106,7 +108,7 @@ module DeepCover
       elsif options[:expression]
         require_relative 'debugger'
         CLI::Debugger.new(options[:expression], **options).show
-      elsif parse_result.exec?
+      elsif parse_result.exec? && parse_result.parser.stopped_for_command
         require_relative 'exec'
         CLI::Exec.new(parse_result.arguments, **options).run
       else
