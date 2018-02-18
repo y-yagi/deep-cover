@@ -3,6 +3,7 @@
 module DeepCover
   require 'slop'
   require_relative '../basics'
+  require_relative 'helpers'
 
   module CLI
   end
@@ -34,19 +35,9 @@ module DeepCover
       puts parse_options
     end
 
-    class AddDefaultToOptionsDescription < Struct.new(:delegate)
-      def method_missing(method, *args, &block) # rubocop:disable Style/MethodMissing
-        options = args.last
-        if options.is_a?(Hash) && options.has_key?(:default)
-          args[-2] += " [#{options[:default]}]"
-        end
-        delegate.public_send(method, *args, &block)
-      end
-    end
-
     def parse_options
       @parse_options ||= Slop::Options.new do |o|
-        o = AddDefaultToOptionsDescription.new(o)
+        o = CLI::Helpers::AddDefaultToOptionsDescription.new(o)
         o.banner = ['usage: deep-cover [options] exec <command ...>',
                     '   or  deep-cover [options] [path/to/app/or/gem]',
         ].join("\n")
